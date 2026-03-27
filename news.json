@@ -1,0 +1,1186 @@
+{
+  "name": "news",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "const sources = [\n  {\n    sourceName: \"Al Jazeera\",\n    category: \"global\",\n    sourceUrl1: \"https://t.me/s/AjaNews\"\n  },\n  {\n    sourceName: \"Al Arabiya\",\n    category: \"global\",\n    sourceUrl2: \"https://t.me/s/AlArabiya\"\n  },\n  {\n    sourceName: \"Sky News Arabia\",\n    category: \"global\",\n    sourceUrl3: \"https://t.me/s/SkyNewsArabia\"\n  },\n  {\n    sourceName: \"RT Arabic\",\n    category: \"global\",\n    sourceUrl4: \"https://t.me/s/rtarabic\"\n  },\n  {\n    sourceName: \"Shafaq News\",\n    category: \"iraq\",\n    sourceUrl5: \"https://t.me/s/Shafaqnews\"\n  },\n  {\n    sourceName: \"Alsumaria\",\n    category: \"iraq\",\n    sourceUrl6: \"https://t.me/s/alsumaria\"\n  },\n  {\n    sourceName: \"Alforat News\",\n    category: \"iraq\",\n    sourceUrl7: \"https://t.me/s/alforat_news\"\n  }\n];\n\nreturn sources.map(source => ({ json: source }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        -112
+      ],
+      "id": "974c54e6-bf51-46f5-9d8b-d14d82b1fcbc",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "url": "=https://t.me/s/AlArabiya",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        544,
+        -352
+      ],
+      "id": "016c7147-3659-4b10-be5b-67dcf1cbf776",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "url": "=https://t.me/s/arabic_farsnews",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        544,
+        -208
+      ],
+      "id": "231d9f5f-1fed-40e1-8eb1-3ab7954368b4",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "url": "https://t.me/s/RTarabic_br",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        544,
+        -80
+      ],
+      "id": "9679f0a1-b2fc-40f0-ae93-66a2f40dd0f9",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "url": "https://t.me/s/Iraq_now3",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        560,
+        48
+      ],
+      "id": "e08a86d6-9a46-4d21-96c1-a4517cb6d198",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "url": "https://t.me/s/alsumariatviraq",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        544,
+        192
+      ],
+      "id": "6b1769de-742c-48ac-9fc4-a0fe21b41f4d",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "url": "=https://t.me/s/AjaNews",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        544,
+        -480
+      ],
+      "id": "64a62f6a-1706-4a22-8871-6f1d46766e18",
+      "name": "HTTP Request6"
+    },
+    {
+      "parameters": {
+        "jsCode": "function cleanText(str) {\n  return str\n    .replace(/<br\\s*\\/?>/gi, \"\\n\")\n    .replace(/<\\/p>/gi, \"\\n\")\n    .replace(/<[^>]+>/g, \"\")\n    .replace(/&nbsp;/g, \" \")\n    .replace(/&amp;/g, \"&\")\n    .replace(/&lt;/g, \"<\")\n    .replace(/&gt;/g, \">\")\n    .replace(/&#39;/g, \"'\")\n    .replace(/&quot;/g, '\"')\n    .replace(/\\n{3,}/g, \"\\n\\n\")\n    .replace(/[ \\t]{2,}/g, \" \")\n    .trim();\n}\n\nconst results = [];\n\nlet counter = 1;\n\nfor (const item of items) {\n  const html = item.json.data || \"\";\n\n  if (!html || typeof html !== \"string\") continue;\n\n  let matches = [\n    ...html.matchAll(/tgme_widget_message_text[^>]*>([\\s\\S]*?)<\\/div>/g)\n  ];\n\n  if (matches.length === 0) {\n    matches = [\n      ...html.matchAll(/js-message_text[^>]*>([\\s\\S]*?)<\\/div>/g)\n    ];\n  }\n\n  if (matches.length === 0) continue;\n\n  const lastFive = matches.slice(-5);\n\n  for (const m of lastFive) {\n    const raw = m[1];\n    const text = cleanText(raw);\n\n    if (!text || text.length < 20) continue;\n\n    results.push({\n      json: {\n        [`originalText(${counter})`]: text\n      }\n    });\n\n    counter++;\n  }\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        -480
+      ],
+      "id": "c7f45731-ae8d-4adf-9c75-3fc898aa6fe0",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "jsCode": "function cleanText(str) {\n  return str\n    .replace(/<br\\s*\\/?>/gi, \"\\n\")\n    .replace(/<\\/p>/gi, \"\\n\")\n    .replace(/<[^>]+>/g, \"\")\n    .replace(/&nbsp;/g, \" \")\n    .replace(/&amp;/g, \"&\")\n    .replace(/&lt;/g, \"<\")\n    .replace(/&gt;/g, \">\")\n    .replace(/&#39;/g, \"'\")\n    .replace(/&quot;/g, '\"')\n    .replace(/\\n{3,}/g, \"\\n\\n\")\n    .replace(/[ \\t]{2,}/g, \" \")\n    .trim();\n}\n\nconst results = [];\n\nlet counter = 1;\n\nfor (const item of items) {\n  const html = item.json.data || \"\";\n\n  if (!html || typeof html !== \"string\") continue;\n\n  let matches = [\n    ...html.matchAll(/tgme_widget_message_text[^>]*>([\\s\\S]*?)<\\/div>/g)\n  ];\n\n  if (matches.length === 0) {\n    matches = [\n      ...html.matchAll(/js-message_text[^>]*>([\\s\\S]*?)<\\/div>/g)\n    ];\n  }\n\n  if (matches.length === 0) continue;\n\n  const lastFive = matches.slice(-5);\n\n  for (const m of lastFive) {\n    const raw = m[1];\n    const text = cleanText(raw);\n\n    if (!text || text.length < 20) continue;\n\n    results.push({\n      json: {\n        [`originalText(${counter})`]: text\n      }\n    });\n\n    counter++;\n  }\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        -352
+      ],
+      "id": "e76d90a6-ea34-45c5-9122-61d33f1b421e",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "jsCode": "function cleanText(str) {\n  return str\n    .replace(/<br\\s*\\/?>/gi, \"\\n\")\n    .replace(/<\\/p>/gi, \"\\n\")\n    .replace(/<[^>]+>/g, \"\")\n    .replace(/&nbsp;/g, \" \")\n    .replace(/&amp;/g, \"&\")\n    .replace(/&lt;/g, \"<\")\n    .replace(/&gt;/g, \">\")\n    .replace(/&#39;/g, \"'\")\n    .replace(/&quot;/g, '\"')\n    .replace(/\\n{3,}/g, \"\\n\\n\")\n    .replace(/[ \\t]{2,}/g, \" \")\n    .trim();\n}\n\nconst results = [];\n\nlet counter = 1;\n\nfor (const item of items) {\n  const html = item.json.data || \"\";\n\n  if (!html || typeof html !== \"string\") continue;\n\n  let matches = [\n    ...html.matchAll(/tgme_widget_message_text[^>]*>([\\s\\S]*?)<\\/div>/g)\n  ];\n\n  if (matches.length === 0) {\n    matches = [\n      ...html.matchAll(/js-message_text[^>]*>([\\s\\S]*?)<\\/div>/g)\n    ];\n  }\n\n  if (matches.length === 0) continue;\n\n  const lastFive = matches.slice(-5);\n\n  for (const m of lastFive) {\n    const raw = m[1];\n    const text = cleanText(raw);\n\n    if (!text || text.length < 20) continue;\n\n    results.push({\n      json: {\n        [`originalText(${counter})`]: text\n      }\n    });\n\n    counter++;\n  }\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        -240
+      ],
+      "id": "cd3d0209-ccdc-45f2-89b9-258208cb860e",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "jsCode": "function cleanText(str) {\n  return str\n    .replace(/<br\\s*\\/?>/gi, \"\\n\")\n    .replace(/<\\/p>/gi, \"\\n\")\n    .replace(/<[^>]+>/g, \"\")\n    .replace(/&nbsp;/g, \" \")\n    .replace(/&amp;/g, \"&\")\n    .replace(/&lt;/g, \"<\")\n    .replace(/&gt;/g, \">\")\n    .replace(/&#39;/g, \"'\")\n    .replace(/&quot;/g, '\"')\n    .replace(/\\n{3,}/g, \"\\n\\n\")\n    .replace(/[ \\t]{2,}/g, \" \")\n    .trim();\n}\n\nconst results = [];\n\nlet counter = 1;\n\nfor (const item of items) {\n  const html = item.json.data || \"\";\n\n  if (!html || typeof html !== \"string\") continue;\n\n  let matches = [\n    ...html.matchAll(/tgme_widget_message_text[^>]*>([\\s\\S]*?)<\\/div>/g)\n  ];\n\n  if (matches.length === 0) {\n    matches = [\n      ...html.matchAll(/js-message_text[^>]*>([\\s\\S]*?)<\\/div>/g)\n    ];\n  }\n\n  if (matches.length === 0) continue;\n\n  const lastFive = matches.slice(-5);\n\n  for (const m of lastFive) {\n    const raw = m[1];\n    const text = cleanText(raw);\n\n    if (!text || text.length < 20) continue;\n\n    results.push({\n      json: {\n        [`originalText(${counter})`]: text\n      }\n    });\n\n    counter++;\n  }\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        -80
+      ],
+      "id": "431541e6-6b0a-44f0-a4e0-570bca069de5",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "jsCode": "function cleanText(str) {\n  return str\n    .replace(/<br\\s*\\/?>/gi, \"\\n\")\n    .replace(/<\\/p>/gi, \"\\n\")\n    .replace(/<[^>]+>/g, \"\")\n    .replace(/&nbsp;/g, \" \")\n    .replace(/&amp;/g, \"&\")\n    .replace(/&lt;/g, \"<\")\n    .replace(/&gt;/g, \">\")\n    .replace(/&#39;/g, \"'\")\n    .replace(/&quot;/g, '\"')\n    .replace(/\\n{3,}/g, \"\\n\\n\")\n    .replace(/[ \\t]{2,}/g, \" \")\n    .trim();\n}\n\nconst results = [];\n\nlet counter = 1;\n\nfor (const item of items) {\n  const html = item.json.data || \"\";\n\n  if (!html || typeof html !== \"string\") continue;\n\n  let matches = [\n    ...html.matchAll(/tgme_widget_message_text[^>]*>([\\s\\S]*?)<\\/div>/g)\n  ];\n\n  if (matches.length === 0) {\n    matches = [\n      ...html.matchAll(/js-message_text[^>]*>([\\s\\S]*?)<\\/div>/g)\n    ];\n  }\n\n  if (matches.length === 0) continue;\n\n  const lastFive = matches.slice(-5);\n\n  for (const m of lastFive) {\n    const raw = m[1];\n    const text = cleanText(raw);\n\n    if (!text || text.length < 20) continue;\n\n    results.push({\n      json: {\n        [`originalText(${counter})`]: text\n      }\n    });\n\n    counter++;\n  }\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        32
+      ],
+      "id": "1c94112f-8375-4754-b37c-29ce2ed8303d",
+      "name": "Code in JavaScript5"
+    },
+    {
+      "parameters": {
+        "jsCode": "function cleanText(str) {\n  return str\n    .replace(/<br\\s*\\/?>/gi, \"\\n\")\n    .replace(/<\\/p>/gi, \"\\n\")\n    .replace(/<[^>]+>/g, \"\")\n    .replace(/&nbsp;/g, \" \")\n    .replace(/&amp;/g, \"&\")\n    .replace(/&lt;/g, \"<\")\n    .replace(/&gt;/g, \">\")\n    .replace(/&#39;/g, \"'\")\n    .replace(/&quot;/g, '\"')\n    .replace(/\\n{3,}/g, \"\\n\\n\")\n    .replace(/[ \\t]{2,}/g, \" \")\n    .trim();\n}\n\nconst results = [];\n\nlet counter = 1;\n\nfor (const item of items) {\n  const html = item.json.data || \"\";\n\n  if (!html || typeof html !== \"string\") continue;\n\n  let matches = [\n    ...html.matchAll(/tgme_widget_message_text[^>]*>([\\s\\S]*?)<\\/div>/g)\n  ];\n\n  if (matches.length === 0) {\n    matches = [\n      ...html.matchAll(/js-message_text[^>]*>([\\s\\S]*?)<\\/div>/g)\n    ];\n  }\n\n  if (matches.length === 0) continue;\n\n  const lastFive = matches.slice(-5);\n\n  for (const m of lastFive) {\n    const raw = m[1];\n    const text = cleanText(raw);\n\n    if (!text || text.length < 20) continue;\n\n    results.push({\n      json: {\n        [`originalText(${counter})`]: text\n      }\n    });\n\n    counter++;\n  }\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        128
+      ],
+      "id": "939665f3-2cd2-4966-9f0d-00996757c746",
+      "name": "Code in JavaScript6"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allItems = items;\n\nconst lastItem = allItems[allItems.length - 1].json;\n\nconst key = Object.keys(lastItem).find(k => k.startsWith(\"originalText\"));\n\nreturn [\n  {\n    json: {\n      originalText: lastItem[key]\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        944,
+        -496
+      ],
+      "id": "3cfc9db9-e894-4c83-a0b8-b90af948f4c6",
+      "name": "Code in JavaScript8"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allItems = items;\n\nconst lastItem = allItems[allItems.length - 1].json;\n\nconst key = Object.keys(lastItem).find(k => k.startsWith(\"originalText\"));\n\nreturn [\n  {\n    json: {\n      originalText: lastItem[key]\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        -352
+      ],
+      "id": "711a3724-897b-4d0d-ae87-64046ada02e7",
+      "name": "Code in JavaScript9"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allItems = items;\n\nconst lastItem = allItems[allItems.length - 1].json;\n\nconst key = Object.keys(lastItem).find(k => k.startsWith(\"originalText\"));\n\nreturn [\n  {\n    json: {\n      originalText: lastItem[key]\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        976,
+        -192
+      ],
+      "id": "3565a1fa-5953-4187-bc39-744ac21070db",
+      "name": "Code in JavaScript10"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allItems = items;\n\nconst lastItem = allItems[allItems.length - 1].json;\n\nconst key = Object.keys(lastItem).find(k => k.startsWith(\"originalText\"));\n\nreturn [\n  {\n    json: {\n      originalText: lastItem[key]\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        976,
+        -64
+      ],
+      "id": "f0fd3844-a044-4fbb-a48e-8abcc3c21ee9",
+      "name": "Code in JavaScript11"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allItems = items;\n\nconst lastItem = allItems[allItems.length - 1].json;\n\nconst key = Object.keys(lastItem).find(k => k.startsWith(\"originalText\"));\n\nreturn [\n  {\n    json: {\n      originalText: lastItem[key]\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        976,
+        64
+      ],
+      "id": "bb1f6a5a-0901-4d7e-9575-c66a4c826cbc",
+      "name": "Code in JavaScript12"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allItems = items;\n\nconst lastItem = allItems[allItems.length - 1].json;\n\nconst key = Object.keys(lastItem).find(k => k.startsWith(\"originalText\"));\n\nreturn [\n  {\n    json: {\n      originalText: lastItem[key]\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        992,
+        176
+      ],
+      "id": "75970a9d-74ee-4e8c-85a4-885be4ff8921",
+      "name": "Code in JavaScript13"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.originalText }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "انت محلل نص لقناة اخبار\n-افحص النص هل هو مهم او لا\n-افحص الخبر هل هو اعلان لشيء ما او لا \n-اعد صياغة الخبر للنشر \n-احذف الهاشتاكات او الروابط من النص\n-اذا كان غير مهم ومجرد اعلان اخرج قيمة <no>\nنفذ ما قلته  لك بدون زسادة او نقصان "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1312,
+        -544
+      ],
+      "id": "d3b3117e-2f88-463a-a1e4-c997917f0cc1",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1552,
+        -448
+      ],
+      "id": "03ee6be2-103e-402a-90ed-2771c81ae60b",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Bi5620fLACtcVA7c",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.originalText }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "انت محلل نص لقناة اخبار\n-افحص النص هل هو مهم او لا\n-افحص الخبر هل هو اعلان لشيء ما او لا \n-اعد صياغة الخبر للنشر \n-احذف الهاشتاكات او الروابط من النص\n-اذا كان غير مهم ومجرد اعلان اخرج قيمة <no>\nنفذ ما قلته  لك بدون زسادة او نقصان "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1344,
+        -416
+      ],
+      "id": "174938d0-c2da-4dad-8551-9a40d3057bd7",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1584,
+        -288
+      ],
+      "id": "42170b07-cb3b-4595-87a3-ee66a241688f",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Bi5620fLACtcVA7c",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.originalText }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "انت محلل نص لقناة اخبار\n-افحص النص هل هو مهم او لا\n-افحص الخبر هل هو اعلان لشيء ما او لا \n-اعد صياغة الخبر للنشر \n-احذف الهاشتاكات او الروابط من النص\n-اذا كان غير مهم ومجرد اعلان اخرج قيمة <no>\nنفذ ما قلته  لك بدون زسادة او نقصان "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1328,
+        -288
+      ],
+      "id": "52631aa2-2464-4628-b84f-f14edbe2581c",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        -128
+      ],
+      "id": "c9832d2e-b9ea-415b-bd5b-30cd0dfabd5a",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Bi5620fLACtcVA7c",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.originalText }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "انت محلل نص لقناة اخبار\n-افحص النص هل هو مهم او لا\n-افحص الخبر هل هو اعلان لشيء ما او لا \n-اعد صياغة الخبر للنشر \n-احذف الهاشتاكات او الروابط من النص\n-اذا كان غير مهم ومجرد اعلان اخرج قيمة <no>\nنفذ ما قلته  لك بدون زسادة او نقصان "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1344,
+        -112
+      ],
+      "id": "5329b4ef-3213-4d83-9481-b89c29fdac78",
+      "name": "AI Agent3"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        16
+      ],
+      "id": "314043d6-f1be-42dc-b808-fb0195398311",
+      "name": "Google Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Bi5620fLACtcVA7c",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.originalText }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "انت نظام فلترة اخبار احترافي.\n\nمهمتك:\n- تحليل النص\n- تحديد هل هو خبر حقيقي او لا\n- تحديد هل هو مهم\n-صنفه(عام,سياسي,اقتصادي,رياضي)\n- اعادة صياغته بشكل مختصر\n\nالقواعد:\n- تجاهل الاعلانات\n-تجاهل الاخبار المكررة (قارنها مع اذاكرة)\n- تجاهل المنشورات غير المهمة\n- لا تضيف معلومات من عندك\n- اكتب بشكل خبري واضح\n\nالنتيجة يجب ان تكون بهذا الشكل فقط:\n\nimportant: yes/no\ntype: سياسي-اقتصادي -عام-رياضي\nrewrite: نص مختصر "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1344,
+        64
+      ],
+      "id": "10afee28-d3b7-490f-8bb5-24cdb0668ade",
+      "name": "AI Agent4"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1616,
+        160
+      ],
+      "id": "bd9944d1-9ac2-4a4c-a69a-86ed9e479dc6",
+      "name": "Google Gemini Chat Model4",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Bi5620fLACtcVA7c",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.originalText }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "انت محلل نص لقناة اخبار\n-افحص النص هل هو مهم او لا\n-افحص الخبر هل هو اعلان لشيء ما او لا \n-اعد صياغة الخبر للنشر \n-احذف الهاشتاكات او الروابط من النص\n-اذا كان غير مهم ومجرد اعلان اخرج قيمة <no>\nنفذ ما قلته  لك بدون زسادة او نقصان "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1328,
+        208
+      ],
+      "id": "65ca3f29-9a4e-4e2f-b8bc-2de0ae4e6a08",
+      "name": "AI Agent5"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1616,
+        272
+      ],
+      "id": "ed7350d7-5e7d-4114-a7a9-d7958bcb12f5",
+      "name": "Google Gemini Chat Model5",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Bi5620fLACtcVA7c",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 7
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2032,
+        -272
+      ],
+      "id": "34fd3a28-e9cb-4f57-8688-b7deddeb6346",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1136,
+        -400
+      ],
+      "id": "d4d49e71-4816-4581-bec0-602eabb68aa3",
+      "name": "Wait",
+      "webhookId": "298b7b91-caae-457a-85d2-d1e97115d568"
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1152,
+        -224
+      ],
+      "id": "5cd37a05-7057-4d26-9b4d-3ef4299cd037",
+      "name": "Wait1",
+      "webhookId": "908a4e29-ae29-4e38-9543-c9528788cc97"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1152,
+        -96
+      ],
+      "id": "b5108c8a-7882-4f03-a61b-1d183c797bea",
+      "name": "Wait2",
+      "webhookId": "feff03ae-6957-47e5-a32f-aaa59b3b3c56"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1168,
+        48
+      ],
+      "id": "6b056922-7115-4e3d-9887-a118159972ae",
+      "name": "Wait3",
+      "webhookId": "e47bf7eb-4916-436b-a622-c7c80d14d801"
+    },
+    {
+      "parameters": {
+        "amount": 20
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1168,
+        208
+      ],
+      "id": "27179a40-e5c5-471a-8341-7d2c3c372168",
+      "name": "Wait4",
+      "webhookId": "94aa747a-ab3e-49e7-92b6-4ee4802a5c07"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b1eef34e-216e-4bbb-8337-311b8fd2383d",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "no",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2256,
+        -192
+      ],
+      "id": "d226fa18-0a07-492a-bb2d-8f2421e810a5",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "function formatNews(text) {\n  return ` 🔴\\n\\n${text}\\n\\n`;\n}\n\nconst results = [];\n\nfor (const item of items) {\n  const text = item.json.messageText || item.json.output || \"\";\n\n  if (!text) continue;\n\n  results.push({\n    json: {\n      formatted: formatNews(text)\n    }\n  });\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2544,
+        -208
+      ],
+      "id": "ef1bffb0-9b04-4080-96f9-5ab1f6c3e296",
+      "name": "Code in JavaScript7"
+    },
+    {
+      "parameters": {
+        "chatId": "@iraqinews_1",
+        "text": "={{ $json.formatted }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2736,
+        -208
+      ],
+      "id": "84003553-db85-404c-b3c2-d7e93f609588",
+      "name": "Send a text message",
+      "webhookId": "c8f8ef08-7a80-4069-b373-57562c4af986",
+      "credentials": {
+        "telegramApi": {
+          "id": "Mkr95585EOqR9lXR",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 30
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        16,
+        -112
+      ],
+      "id": "521a55d5-0ed6-4563-bee7-189a4b7bc017",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1376,
+        -624
+      ],
+      "id": "a83a0df8-b8e1-4fdf-85ac-ccfde500f9d4",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request4": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request6": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript5": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript6": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript13",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript8": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript9": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript10": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript11": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript12": {
+      "main": [
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript13": {
+      "main": [
+        [
+          {
+            "node": "Wait4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent5",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "AI Agent3": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "AI Agent4": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "AI Agent5": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 5
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait3": {
+      "main": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait4": {
+      "main": [
+        [
+          {
+            "node": "AI Agent5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript7",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 6
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript7": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "AI Agent2",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "AI Agent3",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "AI Agent4",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "AI Agent5",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "85522050-807c-45ee-a927-48936b7fe63b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a3495c5db2fad161f454814dd48cbf5f4ff41cbae571b616add9db2a62bf1469"
+  },
+  "id": "8mFKljd0jNCaffnC",
+  "tags": []
+}
