@@ -8,7 +8,7 @@
 2. Import `news.json` into n8n
 3. Connect Telegram
 4. Run workflow
-I am a complete beginner
+5.I am a complete beginner
 my first one repost in github 😁😁
 -If you are a professional please contact me so I can improve myself
 insta https://www.instagram.com/xi2d__/?hl=ar
